@@ -1,41 +1,41 @@
 
 GO
-CREATE TABLE [dbo].[Applications] (
+CREATE TABLE [dbo].[Programs] (
     [Id]                             INT           IDENTITY (1, 1) NOT NULL,
     [ClientId]                       VARCHAR (36)  NOT NULL,
-    [ApplicationName]                VARCHAR (150) NOT NULL,
-    [ApplicationRedirectUrl]         VARCHAR (300) NOT NULL,
-    [ApplicationOffBoardingUrl]      VARCHAR (300) NOT NULL,
-    [ApplicationSignUpUrl]           VARCHAR (300) NOT NULL,
-    [ApplicationEmployeeRedirectUrl] VARCHAR(300)  NOT NULL,
-    [InvitationExpirationTimeInHours] INT          NOT NULL Default (72),
-    [BrandingId]                     INT           NOT NULL,
-    [IsDesktopApplication]			 BIT		   NOT NULL,
+    [ProgramName]                VARCHAR (150) NOT NULL,
+    [ProgramRedirectUrl]         VARCHAR (300) NOT NULL,
+    [ProgramOffBoardingUrl]      VARCHAR (300) NOT NULL,
+    [ProgramSignUpUrl]           VARCHAR (300) NOT NULL,
+    [ProgramEmployeeRedirectUrl] VARCHAR(300)  NOT NULL,
+    [NotificationExpirationTimeInHours] INT          NOT NULL Default (72),
+    [MarkingId]                     INT           NOT NULL,
+    [IsModernProgram]			 BIT		   NOT NULL,
     PRIMARY KEY NONCLUSTERED ([Id] ASC)
 );
 
 
 GO
-PRINT N'Creating Index [dbo].[Applications].[UIX_Applications_ClientId]...';
+PRINT N'Creating Index [dbo].[Programs].[UIX_Programs_ClientId]...';
 
 
 GO
-CREATE UNIQUE CLUSTERED INDEX [UIX_Applications_ClientId]
-    ON [dbo].[Applications]([ClientId] ASC);
+CREATE UNIQUE CLUSTERED INDEX [UIX_Programs_ClientId]
+    ON [dbo].[Programs]([ClientId] ASC);
 
 
 GO
-PRINT N'Creating Table [dbo].[Brandings]...';
+PRINT N'Creating Table [dbo].[Markings]...';
 
 
 GO
-CREATE TABLE [dbo].[Brandings] (
+CREATE TABLE [dbo].[Markings] (
     [Id]                                   INT            IDENTITY (1, 1) NOT NULL,
     [Name]                                 VARCHAR (100)  NOT NULL,
-    [InvitationEmailSubject]               NVARCHAR (255) NOT NULL,
-    [InvitationEmailBody]                  NVARCHAR (MAX) NOT NULL,
-    [InvitationEmailForEagleIdUserSubject] NVARCHAR (255) NOT NULL,
-    [InvitationEmailForEagleIdUserBody]    NVARCHAR (MAX) NOT NULL,
+    [NotificationEmailSubject]               NVARCHAR (255) NOT NULL,
+    [NotificationEmailBody]                  NVARCHAR (MAX) NOT NULL,
+    [NotificationEmailForEagleIdUserSubject] NVARCHAR (255) NOT NULL,
+    [NotificationEmailForEagleIdUserBody]    NVARCHAR (MAX) NOT NULL,
     [EmployeeAuthorizedSubject]            NVARCHAR (255) NOT NULL,
     [EmployeeAuthorizedBody]               NVARCHAR (MAX) NOT NULL,
     [DesktopEmployeeAuthorizedBody]        NVARCHAR (MAX) NOT NULL,
@@ -44,15 +44,15 @@ CREATE TABLE [dbo].[Brandings] (
 
 
 GO
-PRINT N'Creating Table [dbo].[Invitations]...';
+PRINT N'Creating Table [dbo].[Notifications]...';
 
 
 GO
-CREATE TABLE [dbo].[Invitations] (
+CREATE TABLE [dbo].[Notifications] (
     [Id]                              INT              IDENTITY (1, 1) NOT NULL,
-    [InvitationalToken]               UNIQUEIDENTIFIER NOT NULL,
-    [ApplicationId]                   INT              NOT NULL,
-    [InvitationalTokenExpirationDate] DATETIME         NOT NULL,
+    [NotificationalToken]               UNIQUEIDENTIFIER NOT NULL,
+    [ProgramId]                   INT              NOT NULL,
+    [NotificationalTokenExpirationDate] DATETIME         NOT NULL,
     [EmailAddress]                    VARCHAR (50)     NOT NULL,
     [FirstName]                       VARCHAR (50)     NOT NULL,
     [LastName]                        VARCHAR (50)     NOT NULL,
@@ -63,12 +63,12 @@ CREATE TABLE [dbo].[Invitations] (
 
 
 GO
-PRINT N'Creating Index [dbo].[Invitations].[UIX_Invitations_InvitationalToken]...';
+PRINT N'Creating Index [dbo].[Notifications].[UIX_Notifications_NotificationalToken]...';
 
 
 GO
-CREATE UNIQUE CLUSTERED INDEX [UIX_Invitations_InvitationalToken]
-    ON [dbo].[Invitations]([InvitationalToken] ASC);
+CREATE UNIQUE CLUSTERED INDEX [UIX_Notifications_NotificationalToken]
+    ON [dbo].[Notifications]([NotificationalToken] ASC);
 
 
 GO
@@ -78,7 +78,7 @@ PRINT N'Creating Table [dbo].[UserConnections]...';
 GO
 CREATE TABLE [dbo].[UserConnections] (
     [Id]            INT          IDENTITY (1, 1) NOT NULL,
-    [ApplicationId] INT          NOT NULL,
+    [ProgramId] INT          NOT NULL,
     [UserId]        INT          NOT NULL,
     [IndividualId]  VARCHAR (50) NOT NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC)
@@ -86,12 +86,12 @@ CREATE TABLE [dbo].[UserConnections] (
 
 
 GO
-PRINT N'Creating Index [dbo].[UserConnections].[UIX_UserConnections_ApplicationId_UserId]...';
+PRINT N'Creating Index [dbo].[UserConnections].[UIX_UserConnections_ProgramId_UserId]...';
 
 
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [UIX_UserConnections_ApplicationId_UserId]
-    ON [dbo].[UserConnections]([ApplicationId] ASC, [UserId] ASC);
+CREATE UNIQUE NONCLUSTERED INDEX [UIX_UserConnections_ProgramId_UserId]
+    ON [dbo].[UserConnections]([ProgramId] ASC, [UserId] ASC);
 
 
 GO
@@ -129,39 +129,39 @@ CREATE NONCLUSTERED INDEX [IX_Users_EmailAddress]
 
 
 GO
-PRINT N'Creating Default Constraint unnamed constraint on [dbo].[Invitations]...';
+PRINT N'Creating Default Constraint unnamed constraint on [dbo].[Notifications]...';
 
 
 GO
-ALTER TABLE [dbo].[Invitations]
+ALTER TABLE [dbo].[Notifications]
     ADD DEFAULT 0 FOR [Completed];
 
 
 GO
-PRINT N'Creating Foreign Key [dbo].[FK_Applications_ToBrandings]...';
+PRINT N'Creating Foreign Key [dbo].[FK_Programs_ToMarkings]...';
 
 
 GO
-ALTER TABLE [dbo].[Applications]
-    ADD CONSTRAINT [FK_Applications_ToBrandings] FOREIGN KEY ([BrandingId]) REFERENCES [dbo].[Brandings] ([Id]);
+ALTER TABLE [dbo].[Programs]
+    ADD CONSTRAINT [FK_Programs_ToMarkings] FOREIGN KEY ([MarkingId]) REFERENCES [dbo].[Markings] ([Id]);
 
 
 GO
-PRINT N'Creating Foreign Key [dbo].[FK_Invitations_ToApplications]...';
+PRINT N'Creating Foreign Key [dbo].[FK_Notifications_ToPrograms]...';
 
 
 GO
-ALTER TABLE [dbo].[Invitations]
-    ADD CONSTRAINT [FK_Invitations_ToApplications] FOREIGN KEY ([ApplicationId]) REFERENCES [dbo].[Applications] ([Id]);
+ALTER TABLE [dbo].[Notifications]
+    ADD CONSTRAINT [FK_Notifications_ToPrograms] FOREIGN KEY ([ProgramId]) REFERENCES [dbo].[Programs] ([Id]);
 
 
 GO
-PRINT N'Creating Foreign Key [dbo].[FK_UserConnections_ToApplications]...';
+PRINT N'Creating Foreign Key [dbo].[FK_UserConnections_ToPrograms]...';
 
 
 GO
 ALTER TABLE [dbo].[UserConnections]
-    ADD CONSTRAINT [FK_UserConnections_ToApplications] FOREIGN KEY ([ApplicationId]) REFERENCES [dbo].[Applications] ([Id]);
+    ADD CONSTRAINT [FK_UserConnections_ToPrograms] FOREIGN KEY ([ProgramId]) REFERENCES [dbo].[Programs] ([Id]);
 
 
 GO
